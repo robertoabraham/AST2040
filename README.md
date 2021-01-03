@@ -71,6 +71,13 @@ echo "*************************************************"
 conda config --add channels http://ssb.stsci.edu/astroconda
 conda create -n astroconda stsci
 source activate astroconda
+
+echo "*************************************************"
+echo "Final configuration"
+echo "*************************************************"
+git config --global user.name "Roberto Abraham"
+git config --global user.email abraham@astro.utoronto.ca
+
 ```
 
 ## Using the VM
