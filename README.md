@@ -4,7 +4,10 @@ As an experiment I'm trying to manage the setup for this course using my iPad. T
 
 ## Setting up the VM
 
-I purchased a monthly plan for an Ubuntu 18.04 VM using the Working Copy iPad Git client. I kept notes on how this was done in Bear. It was really easy. To provision the machine, first log in as root and set up a user account. Then log in with the user account and install the needed software. Both steps are stored as Termius "snippets" but here they are again.
+I purchased a monthly plan for an Ubuntu 18.04 VM using the Working Copy iPad Git client. I kept notes on how this was done in Bear. It was really easy. To log in to the machines, use SSH private key authentication. The key is embedded in Working Copy, in Termius, and can be retreived from the Digital Ocean account webpage. 
+
+
+To provision the machine, first log in as root and set up a user account. Then log in with the user account and install the needed software. Both steps are stored as Termius "snippets" but here they are again, in the form of shell scripts. You can either execute the snippets directly from Termius, or run the scripts by hand.
 
 1. Create user account
 
@@ -84,11 +87,7 @@ git config --global user.email abraham@astro.utoronto.ca
 
 ### Step 0. Log in and start up a TMUX session
 
-To log in to the machines, use SSH private key authentication. The key is embedded in Working Copy, in Termius, and can be retreived from the Digital Ocean account webpage. I believe it is best to use `mosh` rather than `ssh` though both will work.
-
-Run stuff from your user account, not from the root account.
-
-Access to VMs from mobile devices is inherently a bit flakey, which is why we're using `mosh` instead of `ssh`. Another element in helping to preserve console state and keep stuff on the VM running is to use `tmux`. Here is a handy tmux cheat sheet: https://tmuxcheatsheet.com.
+Run stuff from your user account, not from the root account. I believe it is best to access the MV using `mosh` rather than `ssh`, though both will work. Another element in helping to preserve console state (and keep stuff on the VM running if the connection is broken) is to use `tmux`. Here is a handy tmux cheat sheet: https://tmuxcheatsheet.com.
 
 To create a new session (which you shoudl have to do rarely)
 
