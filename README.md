@@ -4,9 +4,11 @@ As an experiment I'm trying to manage the setup for this course using my iPad. T
 
 ## Setting up the VM
 
-I purchased a monthly plan for an Ubuntu 18.04 VM using the Working Copy iPad Git client. I kept notes on how this was done in Bear. It was really easy. To provision the machine, first log in as root and set up a user account. The log in with the user account and install the needed software. Both steps are stored as Termius "snippets" but here they are again.
+I purchased a monthly plan for an Ubuntu 18.04 VM using the Working Copy iPad Git client. I kept notes on how this was done in Bear. It was really easy. To provision the machine, first log in as root and set up a user account. Then log in with the user account and install the needed software. Both steps are stored as Termius "snippets" but here they are again.
 
-1. Create user account 
+1. Create user account
+
+The following steps create a user account named "abraham". This account has `sudo` access and a password (though logging in from a remote machine will still require an SSH key).
 
 ```
 mkdir -p /home/abraham/.ssh
@@ -93,13 +95,13 @@ Access to VMs from mobile devices is inherently a bit flakey, which is why we're
 To create a new session (which you shoudl have to do rarely)
 
 ```
-tmux new -s "Bob's session
+tmux new -s astro_session
 ```
 
 To detatch from this session:
 
 ```
-^B
+^b
 d
 ```
 
@@ -111,7 +113,7 @@ tmux a
 
 ### Step 1. Activate Anaconda
 
-I'm relying on Anaconda to provide most of the stuff I need, and it's generally been installed in the astroconda virtual environment. So the first thing you need to do is log in as a user and activate the astroconda virtual environment:
+I'm relying on Anaconda to provide most of the stuff I need, so the first thing to do is to activate the astroconda virtual environment:
 
 ```
 source activate astroconda
@@ -140,13 +142,10 @@ When a user first goes to the web page with the notebook they will be prompted f
 The notebook runs on port 8080 in the VM. _To get access to the notebook server, use an SSH tunnel to VM from your local machine_. I currently use Termius on my iPad for this, and it is easy to set up. Once the VM is set up all you need to do is fire up Safari on the iPad and go to: `http://localhost:8080`
 
 
-## Step 3. Bonus Points - Run a VSCode server.
+## Appendix. For bonus Points: run a VSCode server.
 
-An alternative way to access files on the VM is to run the Coder VSCode server. This was completely trivial to set up!
-
-Instructions are here: https://github.com/cdr/code-server/releases/tag/v3.8.0. 
-
-The bottom line is that installation is as simple as doing this:
+This step is optional, as it's perfectly easy to just log in to the VM using termux and 
+edit files using vi. However, an alternative way to access files on the VM is to run the Coder VSCode server. This works fairly well, though it has some issues with using the trackpad to select stuff, and the cursor can sometimes get lost after trackpad moves (though you can get it back by tapping with your finger). In any case, it's pretty cool and is completely trivial to set up! Instructions are here: https://github.com/cdr/code-server/releases/tag/v3.8.0, and installation is as simple as doing this:
 
 ```
 curl -fsSL https://code-server.dev/install.sh | sh
