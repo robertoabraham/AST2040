@@ -1,115 +1,154 @@
-# AST2040
+# AST2040 - Technical setup 
+
+As an experiment I'm trying to manage the setup for this course using my iPad. The heavy lifting is all done using remote access to a virtual machine running on the Digital Ocean cloud.
+
+## Setting up the VM
+
+I purchased a monthly plan for an Ubuntu 18.04 VM using the Working Copy iPad Git client. I kept notes on how this was done in Bear. It was really easy. To provision the machine, first log in as root and set up a user account. The log in with the user account and install the needed software. Both steps are stored as Termius "snippets" but here they are again.
+
+1. Create user account 
+
+```
+mkdir -p /home/abraham/.ssh
+touch /home/abraham/.ssh/authorized_keys
+useradd -d /home/abraham abraham
+usermod -aG sudo abraham
+usermod -s /bin/bash abraham
+chown -R abraham:abraham /home/abraham/
+chmod 700 /home/abraham/.ssh
+chmod 644 /home/abraham/.ssh/authorized_keys
+cat .ssh/authorized_keys >> /home/abraham/.ssh/authorized_keys
+passwd abraham
+```
+
+2. Install software
+
+```
+#!/bin/bash
+#
+# THIS SHOULD BE RUN IN YOUR USER ACCOUNT AND NOT AS ROOT!
+# 
+# If this is a fresh Digital Ocean VM you should first create 
+# your user account using a separate snippet.
+# 
+# Follow the steps in this URL, which shows you how to add
+# a user account and how to set things up to access it using 
+# a private SSH key:
+# https://shandou.medium.com/testing-out-digitalocean-droplet-1-steps-for-ssh-into-droplet-as-non-root-user-with-sudo-access-c2a7a5229cd6
 
 
-Syllabus for AST2040H - Extragalactic Astronomy
+#echo "*************************************************"
+#echo Update to latest packages
+#echo "*************************************************"
+sudo apt update
+
+#echo "*************************************************"
+#echo Installing mosh
+#echo "*************************************************"
+sudo apt-get -y install software-properties-common
+sudo add-apt-repository ppa:keithw/mosh
+sudo apt-get update
+sudo apt-get -y install mosh
+
+echo "*************************************************"
+echo "Installing gcc, node, and npm"
+echo "*************************************************"
+sudo apt-get -y install gcc nodejs npm
+
+echo "*************************************************"
+echo "Installing Miniconda Python 3.8"
+echo "*************************************************"
+mkdir -p tmp
+cd tmp
+curl -O https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+bash ./Miniconda3-latest-Linux-x86_64.sh -b
+echo 'export PATH="/home/abraham/miniconda3/bin:$PATH"' >> ~/.bashrc
+source ~/.bashrc
+
+echo "*************************************************"
+echo "Installing AstroConda (might prompt for a 'yes')"
+echo "*************************************************"
+conda config --add channels http://ssb.stsci.edu/astroconda
+conda create -n astroconda stsci
+source activate astroconda
+```
+
+## Using the VM
+
+### Step 0. Log in and start up a TMUX session
+
+To log in to the machines, use SSH private key authentication. The key is embedded in Working Copy, in Termius, and can be retreived from the Digital Ocean account webpage. I believe it is best to use `mosh` rather than `ssh` though both will work.
+
+Run stuff from your user account, not from the root account.
+
+Access to VMs from mobile devices is inherently a bit flakey, which is why we're using `mosh` instead of `ssh`. Another element in helping to preserve console state and keep stuff on the VM running is to use `tmux`. Here is a handy tmux cheat sheet: https://tmuxcheatsheet.com.
+
+To create a new session (which you shoudl have to do rarely)
+
+```
+tmux new -s "Bob's session
+```
+
+To detatch from this session:
+
+```
+^B
+d
+```
+
+When you log back in, reattach to the session:
+
+```
+tmux a
+```
+
+### Step 1. Activate Anaconda
+
+I'm relying on Anaconda to provide most of the stuff I need, and it's generally been installed in the astroconda virtual environment. So the first thing you need to do is log in as a user and activate the astroconda virtual environment:
+
+```
+source activate astroconda
+```
+
+## Step 2. Run the Jupyter notebook server. 
+
+### Running the Jupyter server
+
+You can start up the server from anywhere. If you're worried, don't do it from your root directory. Probably `/home/abraham/git` is as good a choice as any.
+
+```
+jupyter notebook --no-browser
+```
+
+This will provide a set of links which you can click on. However, the URL has a long token, and if you close the tab with the notebook interface you'll have to log back into the VM and do some digging around to figure out the tokens. It's better to avoid making the user worry about dealing with tokens by first seting a password this way:
+
+```
+jupyter notebook password
+```
+
+When a user first goes to the web page with the notebook they will be prompted for the password. If you forget the password you can reset it using the same command.
+
+### Viewing Jupyter notebooks
+
+The notebook runs on port 8080 in the VM. _To get access to the notebook server, use an SSH tunnel to VM from your local machine_. I currently use Termius on my iPad for this, and it is easy to set up. Once the VM is set up all you need to do is fire up Safari on the iPad and go to: `http://localhost:8080`
 
 
-Format: The class meets twice a week in room AB88. Classes are on Tuesdays (2pm) and Thursdays (2pm). Each class will be in one of three formats:
+## Step 3. Bonus Points - Run a VSCode server.
 
-1. Formal Lecture
-2. Discussion Session
-3. Practical/Problem Session
+An alternative way to access files on the VM is to run the Coder VSCode server. This was completely trivial to set up!
 
-Roughly 40% of the classes will be formal lectures, 40% will be discussion sessions, and 20% will be practical/problem sessions. A typical week will be a lecture on Tuesday followed by assigned reading which is then discussed on Thursday, followed by more assigned reading. Problem sessions will be intermixed sporadically.
+Instructions are here: https://github.com/cdr/code-server/releases/tag/v3.8.0. 
 
-Assigned readings will be from the textbook, which is Peter Schneider's "Extragalactic Astronomy and Cosmology: An Introduction". It is available on Amazon (in physical and e-book formats).
+The bottom line is that installation is as simple as doing this:
 
-Evaluation: 50% final oral exam (lasting 45min-1hr, and comprised of roughly three questions plus associated follow-up questions), 30% assignment, and 20% class participation. 
+```
+curl -fsSL https://code-server.dev/install.sh | sh
+```
 
-The focus of the class will be very heavily weighted toward the subset of the 100 qualifier questions noted below.
+To start up the server:
 
-If time permits up to two classes will be devoted to topics (decided on by the students based on perceived interest) that are NOT contained within the 100 qualifier questions.
+```
+code-server &
+```
 
-Things covered in practical/problem sessions may include some or all of: (1) Computation of cosmological distances; (2) Generation of random distributions of various forms; (3) Spectral synthesis modeling; (4) Computation of luminosity functions.
-
-Knowledge of a subset of the 100 qual questions is assumed, these are spelled out below. If you don't already know the answers to these questions, you need to learn that material on your own.
-
-
-LINKAGE WITH THE 100 QUESTIONS
-
-Questions I will attempt to cover in AST2040. I will cover as many as there is time for, and will try to do them all but will likely miss a few.
-
-COSMOLOGY (EARLY UNIVERSE, CMB, LARGE-SCALE STRUCTURE)
-
-3. Outline the development of the Cold Dark Matter spectrum of density fluctuations from the early universe to the current epoch.
-
-10. What are the currently accepted relative fractions of the various components of the matter-energy density of the universe? (i.e., what are the values of the various Omega_i's)
-
-12. Explain how measurements of the angular power spectrum of the cosmic microwave background are used in the determination of cosmological parameters.
-
-17. Define the two-point correlation function. How is it related to the power spectrum? How is the C_l spectrum of the CMB related to low redshift galaxy clustering?
-
-19. Define and describe the epoch of reionization.  What are the observational constraints on it?
-
-EXTRAGALACTIC ASTRONOMY (GALAXIES AND GALAXY EVOLUTION, PHENOMENOLOGY)
-
-1. Sketch out the Hubble sequence. What physical trends are captured by the classification system?
-
-2. What is the total mass (in both dark matter and in stars) of the Milky Way galaxy? How does this compare to M31 and to the LMC?  How is this mass determined?
-
-3. How do we know that the intergalactic medium is ionized?
-
-5. What evidence is there that most galaxies contain nuclear black holes? How do those black holes interact with their host galaxies?
-
-7. Sketch out typical spectra representing spiral and elliptical galaxies, starting from the UV and ending in the mid-IR. Label the important features.
-
-9.  Describe the currently accepted model for the formation of the various types of galaxies.  What are the lines of evidence to support this model?
-
-10. Describe three different methods used in the determination of the mass of a galaxy cluster.
-
-11. What is the density-morphology relation for galaxies? How is that related to what we know about the relationship between galaxy density and star formation rates in galaxies?
-
-12. Draw the spectral energy distribution (SED) of a galaxy formed by a single burst of star formation at the ages of 10 Myrs, 2Gyrs, and 10 Gyr.
-
-13. What are Lyman-Break Galaxies and how do we find them?
-
-14. Draw a spectrum of a high-redshift quasar. What do quasar emission lines typically look like? Explain what we see in the spectrum at rest wavelengths bluer than 1216A.
-
-15. Sketch the SED from the radio to gamma of extragalactic radiation on large angular scales.  Describe the source and emission mechanism for each feature.
-
-16. What are AGNs?  Describe different observational classes of them and how they may relate to each other.
-
-17. What are galaxy clusters?  What are their basic properties (eg, mass, size). List and explain three ways they can be detected.
-
-18. Describe and give results from simulations of large scale structure in the universe.  What role do they have in understanding the formation of large scale structure and Galaxy formation?  What are their limitations?
-
-GALACTIC ASTRONOMY (INCLUDES STAR FORMATION/ISM)
-
-1. What is a stellar Initial Mass Function (IMF)? Sketch it.  Give a couple of examples of simple parametric forms used to describe the IMF.
-
-8. The stars in the solar neighbourhood, roughly the 300 pc around us, have a range of ages, metallicities and orbital properties. How are those properties related?
-
-12. Sketch the SED, from the radio to Gamma, of a spiral galaxy like the Milky Way.  Describe the source and radiative mechanism of each feature.
-
-15. Sketch the rotation curve for a typical spiral galaxy.  Show that a flat rotation curve implies the existence of a dark matter halo with a density profile that drops off as 1/r^2.
-
-17. Characterize the stellar populations in the following regions: i) the Galactic bulge ii) the Galactic disk, outside of star clusters iii) open star clusters iv) globular clusters v) a typical elliptical galaxy.
-
-
-
-Questions I assume you already know how to answer (or will figure out on your own in about the first week of class, with a little help from me to guide you about what to read) and will not cover in the course
-
-COSMOLOGY (EARLY UNIVERSE, CMB, LARGE-SCALE STRUCTURE)
-
-2. The universe is said to be "flat", or, close to flat. What are the properties of a flat universe and what evidence do we have for it?
-
-6. Sketch a graph of recession speed vs. distance for galaxies out to and beyond the Hubble distance.
-
-9. Rank the relative ages of the following universes, given an identical current-day Hubble constant for all of them: an accelerating universe, an open universe, a flat universe.
-
-STARS AND PLANETS (INCLUDES COMPACT OBJECTS)
-
-1. Sketch out an H-R diagram. Indicate where on the main sequence different spectral classes lie.  Draw and describe the post main-sequence tracks of both low- and high-mass stars.
-
-16. Sketch the SED of an O, A, G, M, and T star. Give defining spectral characteristics, and describe physically.
-
-EXTRAGALACTIC ASTRONOMY (GALAXIES AND GALAXY EVOLUTION, PHENOMENOLOGY)
-
-4. Describe as many steps of the distance ladder and the involved techniques as you can.  What are the rough distances to the Magellanic Clouds, Andromeda, and the Virgo Cluster?
-
-MATH AND GENERAL PHYSICS (INCLUDES RADIATION PROCESSES, RELATIVITY, STATISTICS)
-
-7. What are "forbidden lines" of atomic spectra? In what conditions are they observationally important?
-
-23. Sketch and give the equations for each of the following distributions: 1. Gaussian (Normal distribution); 2. Poisson distribution; 3. Log-normal distribution. Give two examples from astrophysics where each of these distributions apply.
- 
+Access the server using an SSH tunnel, this time to port 8080.
