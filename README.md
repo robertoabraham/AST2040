@@ -8,9 +8,11 @@ I purchased a monthly plan for an Ubuntu 18.04 VM using the Working Copy iPad Gi
 
 1. Create user account
 
-The following steps create a user account named "abraham". This account has `sudo` access and a password (though logging in from a remote machine will still require an SSH key).
+The following script will create a user account named "abraham". This account has `sudo` access and a password (though logging in from a remote machine will still require an SSH key).
 
 ```
+#!/bin/bash
+
 mkdir -p /home/abraham/.ssh
 touch /home/abraham/.ssh/authorized_keys
 useradd -d /home/abraham abraham
@@ -25,19 +27,15 @@ passwd abraham
 
 2. Install software
 
+Log in as the user (_do not run this as root!_) and run this script to provision the machine.
+
 ```
 #!/bin/bash
-#
+
 # THIS SHOULD BE RUN IN YOUR USER ACCOUNT AND NOT AS ROOT!
 # 
 # If this is a fresh Digital Ocean VM you should first create 
 # your user account using a separate snippet.
-# 
-# Follow the steps in this URL, which shows you how to add
-# a user account and how to set things up to access it using 
-# a private SSH key:
-# https://shandou.medium.com/testing-out-digitalocean-droplet-1-steps-for-ssh-into-droplet-as-non-root-user-with-sudo-access-c2a7a5229cd6
-
 
 #echo "*************************************************"
 #echo Update to latest packages
