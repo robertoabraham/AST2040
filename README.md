@@ -56,7 +56,7 @@ sudo apt-get -y install mosh
 echo "*************************************************"
 echo "Installing gcc, node, and npm"
 echo "*************************************************"
-sudo apt-get -y install gcc nodejs npm
+sudo apt-get -y install gcc gfortran nodejs npm
 
 echo "*************************************************"
 echo "Installing Miniconda Python 3.8"
@@ -76,10 +76,24 @@ conda create -n astroconda stsci
 source activate astroconda
 
 echo "*************************************************"
-echo "Final configuration"
+echo "Set up Git"
 echo "*************************************************"
 git config --global user.name "Roberto Abraham"
 git config --global user.email abraham@astro.utoronto.ca
+
+echo "*************************************************"
+echo "Install FSPS and Python bindings to it"
+echo "*************************************************"
+mkdir -p ~/git
+cd ~/git
+git clone https://github.com/cconroy20/fsps
+echo 'export SPS_HOME="/home/abraham/git/fsps/"' >> ~/.bashrc
+source ~/.bashrc
+cd fsps/src
+make
+cd ~/git
+source activate astroconda
+pip install fsps
 
 ```
 
