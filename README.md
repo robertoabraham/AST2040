@@ -73,7 +73,12 @@ echo "Installing AstroConda (might prompt for a 'yes')"
 echo "*************************************************"
 conda config --add channels http://ssb.stsci.edu/astroconda
 conda create -n astroconda stsci
+
+echo "*************************************************"
+echo "Installing additional conda packages"
+echo "*************************************************"
 source activate astroconda
+conda install -y -c conda-forge jupyterthemes
 
 echo "*************************************************"
 echo "Set up Git"
